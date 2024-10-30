@@ -2,9 +2,9 @@ module Main where
 
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
-import System.Process
-import System.FilePath
-import System.Exit
+import System.Process ( runCommand, waitForProcess )
+import System.FilePath ( replaceExtension )
+import System.Exit ( exitSuccess )
 
 import AbsInstant ()
 import ErrM ()
@@ -24,8 +24,8 @@ run fName code =
             Left err -> hPutStrLn stderr err
             Right (_, (names, register, result)) -> do
               writeFile (replaceExtension fName "ll") $ unlines $ llvmHeader ++ result ++ llvmFooter
-              child <- runCommand $ "llvm-as " ++ replaceExtension fName "ll"
-              waitForProcess child
+              process <- runCommand $ "llvm-as " ++ replaceExtension fName "ll"
+              waitForProcess process
               exitSuccess
 
 main :: IO ()
